@@ -1,0 +1,8 @@
+version: "1"
+packages:
+  - name: "postgres"
+    path: "postgres"
+    queries: "queries.sql"
+    schema: "schema.sql"
+    
+ 
