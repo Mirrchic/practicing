@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"practiceBeforeWork/postgres"
+	"practicing/postgres"
 
 	_ "github.com/lib/pq"
 )

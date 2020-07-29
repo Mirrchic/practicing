@@ -7,7 +7,7 @@ import (
 	"context"
 )
 
-const addNews = `-- name: AddNews :one
+const addNews = `-- name: AddNews :many
 INSERT INTO news (newstitle, newsstatus)
 VALUES ($1, $2) RETURNING id, newstitle, newsstatus
 `
@@ -17,11 +17,27 @@ type AddNewsParams struct {
 	Newsstatus string
 }
 
-func (q *Queries) AddNews(ctx context.Context, arg AddNewsParams) (News, error) {
-	row := q.db.QueryRowContext(ctx, addNews, arg.Newstitle, arg.Newsstatus)
-	var i News
-	err := row.Scan(&i.ID, &i.Newstitle, &i.Newsstatus)
-	return i, err
+func (q *Queries) AddNews(ctx context.Context, arg AddNewsParams) ([]News, error) {
+	rows, err := q.db.QueryContext(ctx, addNews, arg.Newstitle, arg.Newsstatus)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []News
+	for rows.Next() {
+		var i News
+		if err := rows.Scan(&i.ID, &i.Newstitle, &i.Newsstatus); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const allNews = `-- name: AllNews :many

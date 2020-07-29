@@ -9,6 +9,6 @@ WHERE id = $1 LIMIT 1;
 DELETE FROM news 
 WHERE id = $1;
 
--- name: AddNews :one
+-- name: AddNews :many
 INSERT INTO news (newstitle, newsstatus)
 VALUES ($1, $2) RETURNING *;
