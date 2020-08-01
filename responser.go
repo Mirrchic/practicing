@@ -53,3 +53,46 @@ func ArcicleDeleteFetch(r *http.Request) error {
 	}
 	return nil
 }
+
+func AddContentMarkeFetch(r *http.Request) (postgres.Contentmarketing, error) {
+	contentJson, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return postgres.Contentmarketing{}, err
+	}
+	var market postgres.AddContentMarketingParams
+	err = json.Unmarshal(contentJson, &market)
+	if err != nil {
+		return postgres.Contentmarketing{}, err
+	}
+	answer, err := AddContentMarketDB(market)
+	if err != nil {
+		return postgres.Contentmarketing{}, err
+	}
+	return answer, nil
+}
+
+func DeleteContentMarketFetch(r *http.Request) error {
+	contentDelJson, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return err
+	}
+	var marketDelete postgres.Contentmarketing
+	err = json.Unmarshal(contentDelJson, &marketDelete)
+	if err != nil {
+		return err
+	}
+	err = DeleteContentMarketDB(marketDelete.Harvestid)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func AllContentMarketingFetch(r *http.Request) ([]postgres.Contentmarketing, error) {
+	ctx := r.Context()
+	answer, err := AllContentMarketingDB(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return answer, nil
+}

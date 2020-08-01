@@ -2,7 +2,8 @@ CREATE TABLE contentMarketing (
     harvestId TEXT NOT NULL,
     commercialPartner TEXT NOT NULL ,
     logoURL TEXT NOT NULL ,
-    cerebroScore TEXT NOT NULL 
+    cerebroScore TEXT NOT NULL,
+         UNIQUE (harvestId)
 );
 
 
