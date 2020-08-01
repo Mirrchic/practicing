@@ -7,26 +7,87 @@ import (
 	"context"
 )
 
-const addNews = `-- name: AddNews :many
-INSERT INTO news (newstitle, newsstatus)
-VALUES ($1, $2) RETURNING id, newstitle, newsstatus
+const addArticle = `-- name: AddArticle :one
+INSERT INTO articles (harvestId, cerebroScore, url, title, cleanImage )
+VALUES ($1, $2, $3, $4, $5) RETURNING harvestid, cerebroscore, url, title, cleanimage
 `
 
-type AddNewsParams struct {
-	Newstitle  string
-	Newsstatus string
+type AddArticleParams struct {
+	Harvestid    string `json:"harvestid"`
+	Cerebroscore string `json:"cerebroscore"`
+	Url          string `json:"url"`
+	Title        string `json:"title"`
+	Cleanimage   string `json:"cleanimage"`
 }
 
-func (q *Queries) AddNews(ctx context.Context, arg AddNewsParams) ([]News, error) {
-	rows, err := q.db.QueryContext(ctx, addNews, arg.Newstitle, arg.Newsstatus)
+func (q *Queries) AddArticle(ctx context.Context, arg AddArticleParams) (Article, error) {
+	row := q.db.QueryRowContext(ctx, addArticle,
+		arg.Harvestid,
+		arg.Cerebroscore,
+		arg.Url,
+		arg.Title,
+		arg.Cleanimage,
+	)
+	var i Article
+	err := row.Scan(
+		&i.Harvestid,
+		&i.Cerebroscore,
+		&i.Url,
+		&i.Title,
+		&i.Cleanimage,
+	)
+	return i, err
+}
+
+const addContentMarketing = `-- name: AddContentMarketing :one
+INSERT INTO contentMarketing (harvestId, commercialPartner, logoURL, cerebroScore)
+VALUES ($1, $2, $3, $4) RETURNING harvestid, commercialpartner, logourl, cerebroscore
+`
+
+type AddContentMarketingParams struct {
+	Harvestid         string `json:"harvestid"`
+	Commercialpartner string `json:"commercialpartner"`
+	Logourl           string `json:"logourl"`
+	Cerebroscore      string `json:"cerebroscore"`
+}
+
+func (q *Queries) AddContentMarketing(ctx context.Context, arg AddContentMarketingParams) (Contentmarketing, error) {
+	row := q.db.QueryRowContext(ctx, addContentMarketing,
+		arg.Harvestid,
+		arg.Commercialpartner,
+		arg.Logourl,
+		arg.Cerebroscore,
+	)
+	var i Contentmarketing
+	err := row.Scan(
+		&i.Harvestid,
+		&i.Commercialpartner,
+		&i.Logourl,
+		&i.Cerebroscore,
+	)
+	return i, err
+}
+
+const allArticles = `-- name: AllArticles :many
+SELECT harvestid, cerebroscore, url, title, cleanimage FROM articles
+`
+
+func (q *Queries) AllArticles(ctx context.Context) ([]Article, error) {
+	rows, err := q.db.QueryContext(ctx, allArticles)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []News
+	var items []Article
 	for rows.Next() {
-		var i News
-		if err := rows.Scan(&i.ID, &i.Newstitle, &i.Newsstatus); err != nil {
+		var i Article
+		if err := rows.Scan(
+			&i.Harvestid,
+			&i.Cerebroscore,
+			&i.Url,
+			&i.Title,
+			&i.Cleanimage,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -40,20 +101,25 @@ func (q *Queries) AddNews(ctx context.Context, arg AddNewsParams) ([]News, error
 	return items, nil
 }
 
-const allNews = `-- name: AllNews :many
-SELECT id, newstitle, newsstatus FROM news
+const allContentMarketing = `-- name: AllContentMarketing :many
+SELECT harvestid, commercialpartner, logourl, cerebroscore FROM contentMarketing
 `
 
-func (q *Queries) AllNews(ctx context.Context) ([]News, error) {
-	rows, err := q.db.QueryContext(ctx, allNews)
+func (q *Queries) AllContentMarketing(ctx context.Context) ([]Contentmarketing, error) {
+	rows, err := q.db.QueryContext(ctx, allContentMarketing)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []News
+	var items []Contentmarketing
 	for rows.Next() {
-		var i News
-		if err := rows.Scan(&i.ID, &i.Newstitle, &i.Newsstatus); err != nil {
+		var i Contentmarketing
+		if err := rows.Scan(
+			&i.Harvestid,
+			&i.Commercialpartner,
+			&i.Logourl,
+			&i.Cerebroscore,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -67,24 +133,58 @@ func (q *Queries) AllNews(ctx context.Context) ([]News, error) {
 	return items, nil
 }
 
-const deleteNews = `-- name: DeleteNews :exec
-DELETE FROM news 
-WHERE id = $1
+const deleteArticles = `-- name: DeleteArticles :exec
+DELETE FROM articles 
+WHERE harvestId = $1
 `
 
-func (q *Queries) DeleteNews(ctx context.Context, id int32) error {
-	_, err := q.db.ExecContext(ctx, deleteNews, id)
+func (q *Queries) DeleteArticles(ctx context.Context, harvestid string) error {
+	_, err := q.db.ExecContext(ctx, deleteArticles, harvestid)
 	return err
 }
 
-const getNews = `-- name: GetNews :one
-SELECT id, newstitle, newsstatus FROM news 
-WHERE id = $1 LIMIT 1
+const deleteContentMarketing = `-- name: DeleteContentMarketing :exec
+DELETE FROM contentMarketing 
+WHERE harvestId = $1
 `
 
-func (q *Queries) GetNews(ctx context.Context, id int32) (News, error) {
-	row := q.db.QueryRowContext(ctx, getNews, id)
-	var i News
-	err := row.Scan(&i.ID, &i.Newstitle, &i.Newsstatus)
+func (q *Queries) DeleteContentMarketing(ctx context.Context, harvestid string) error {
+	_, err := q.db.ExecContext(ctx, deleteContentMarketing, harvestid)
+	return err
+}
+
+const getNewsArticles = `-- name: GetNewsArticles :one
+SELECT harvestid, cerebroscore, url, title, cleanimage FROM articles 
+WHERE harvestId = $1 LIMIT 1
+`
+
+func (q *Queries) GetNewsArticles(ctx context.Context, harvestid string) (Article, error) {
+	row := q.db.QueryRowContext(ctx, getNewsArticles, harvestid)
+	var i Article
+	err := row.Scan(
+		&i.Harvestid,
+		&i.Cerebroscore,
+		&i.Url,
+		&i.Title,
+		&i.Cleanimage,
+	)
+	return i, err
+}
+
+const getNewsContentMarketing = `-- name: GetNewsContentMarketing :one
+SELECT harvestid, cerebroscore, url, title, cleanimage FROM articles 
+WHERE harvestId = $1 LIMIT 1
+`
+
+func (q *Queries) GetNewsContentMarketing(ctx context.Context, harvestid string) (Article, error) {
+	row := q.db.QueryRowContext(ctx, getNewsContentMarketing, harvestid)
+	var i Article
+	err := row.Scan(
+		&i.Harvestid,
+		&i.Cerebroscore,
+		&i.Url,
+		&i.Title,
+		&i.Cleanimage,
+	)
 	return i, err
 }

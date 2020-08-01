@@ -1,12 +1,10 @@
 package main
 
 import (
-	"context"
-	"database/sql"
-	"fmt"
-	"log"
-	"practicing/postgres"
+	"encoding/json"
+	"net/http"
 
+	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 )
 
@@ -15,26 +13,42 @@ const (
 	port     = 5432
 	user     = "postgres"
 	password = "1111"
-	dbname   = "users"
+	dbname   = "postgres"
 )
 
 func main() {
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
-	conn, err := sql.Open("postgres", psqlInfo)
-	if err != nil {
-		log.Fatal("while open \n", err)
-	}
+	r := mux.NewRouter()
+	r.HandleFunc("articles/add_ar", AddArticle).Methods("POST")
+	r.HandleFunc("articles/delete", DeleteArticle).Methods("POST")
+	r.HandleFunc("articles/get_articles", GetArtcles).Methods("GET")
+	http.ListenAndServe(":8888", nil)
 
-	db := postgres.New(conn)
+}
 
-	news, err := db.AddNews(context.Background(), postgres.AddNewsParams{
-		Newsstatus: "Breaking",
-		Newstitle:  "Somethink doesn't work sqlc",
-	})
+func AddArticle(w http.ResponseWriter, r *http.Request) {
+	answer, err := AddArticleFetch(r)
 	if err != nil {
-		log.Fatal("while created \n", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	log.Print(news)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(answer)
+}
+
+func DeleteArticle(w http.ResponseWriter, r *http.Request) {
+	err := ArcicleDeleteFetch(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	w.Write([]byte("Secsessufully deleted"))
+}
+
+func GetArtcles(w http.ResponseWriter, r *http.Request) {
+	answer, err := GetArticlesFetch(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(answer)
 }

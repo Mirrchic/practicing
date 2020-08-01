@@ -4,5 +4,6 @@ packages:
     path: "postgres"
     queries: "queries.sql"
     schema: "schema.sql"
+    emit_json_tags: true
     
  
