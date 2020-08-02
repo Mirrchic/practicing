@@ -15,11 +15,11 @@ const (
 	dbname   = "postgres"
 )
 
-func AddArcicleDB(arcticle postgres.AddArticleParams) (postgres.Article, error) {
+func AddArcicleDB(ctx context.Context, arcticle postgres.AddArticleParams) (postgres.Article, error) {
 	//TODO: make pointers
 	db, err := DBInit()
 	//check if it's wont have a problem
-	art, err := db.AddArticle(context.Background(), arcticle)
+	art, err := db.AddArticle(ctx, arcticle)
 	if err != nil {
 		return postgres.Article{}, err
 	}
@@ -38,36 +38,36 @@ func GetArticlesDB(ctx context.Context) ([]postgres.Article, error) {
 	return art, nil
 }
 
-func ArticleDeletDB(harvestID string) error {
+func ArticleDeletDB(ctx context.Context, harvestID string) error {
 	db, err := DBInit()
 	if err != nil {
 		return err
 	}
-	err = db.DeleteArticles(context.Background(), harvestID)
+	err = db.DeleteArticles(ctx, harvestID)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func AddContentMarketDB(contMarket postgres.AddContentMarketingParams) (postgres.Contentmarketing, error) {
+func AddContentMarketDB(ctx context.Context, contMarket postgres.AddContentMarketingParams) (postgres.Contentmarketing, error) {
 	db, err := DBInit()
 	if err != nil {
 		return postgres.Contentmarketing{}, err
 	}
-	content, err := db.AddContentMarketing(context.Background(), contMarket)
+	content, err := db.AddContentMarketing(ctx, contMarket)
 	if err != nil {
 		return postgres.Contentmarketing{}, err
 	}
 	return content, nil
 }
 
-func DeleteContentMarketDB(harvestID string) error {
+func DeleteContentMarketDB(ctx context.Context, harvestID string) error {
 	db, err := DBInit()
 	if err != nil {
 		return err
 	}
-	err = db.DeleteContentMarketing(context.Background(), harvestID)
+	err = db.DeleteContentMarketing(ctx, harvestID)
 	if err != nil {
 		return err
 	}
