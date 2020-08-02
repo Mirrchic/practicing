@@ -19,7 +19,7 @@ func AddArticleFetch(r *http.Request) (postgres.Article, error) {
 	if err != nil {
 		return postgres.Article{}, err
 	}
-	artReturn, err := repo.AddArcicleDB(article)
+	artReturn, err := repo.AddArcicleDB(r.Context(), article)
 	if err != nil {
 		return postgres.Article{}, err
 	}
@@ -48,7 +48,7 @@ func ArcicleDeleteFetch(r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	err = repo.ArticleDeletDB(article.Harvestid)
+	err = repo.ArticleDeletDB(r.Context(), article.Harvestid)
 	if err != nil {
 		return err
 	}
@@ -65,7 +65,7 @@ func AddContentMarkeFetch(r *http.Request) (postgres.Contentmarketing, error) {
 	if err != nil {
 		return postgres.Contentmarketing{}, err
 	}
-	answer, err := repo.AddContentMarketDB(market)
+	answer, err := repo.AddContentMarketDB(r.Context(), market)
 	if err != nil {
 		return postgres.Contentmarketing{}, err
 	}
@@ -82,7 +82,7 @@ func DeleteContentMarketFetch(r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	err = repo.DeleteContentMarketDB(marketDelete.Harvestid)
+	err = repo.DeleteContentMarketDB(r.Context(), marketDelete.Harvestid)
 	if err != nil {
 		return err
 	}
