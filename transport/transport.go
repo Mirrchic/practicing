@@ -7,7 +7,7 @@ import (
 )
 
 func AddArticle(w http.ResponseWriter, r *http.Request) {
-	answer, err := service.AddArticleFetch(r)
+	answer, err := service.New(r).AddArticleFetch()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -17,7 +17,7 @@ func AddArticle(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteArticle(w http.ResponseWriter, r *http.Request) {
-	err := service.ArcicleDeleteFetch(r)
+	err := service.New(r).ArcicleDeleteFetch()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -25,7 +25,7 @@ func DeleteArticle(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetArtcles(w http.ResponseWriter, r *http.Request) {
-	answer, err := service.GetArticlesFetch(r)
+	answer, err := service.New(r).GetArticlesFetch()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -35,7 +35,7 @@ func GetArtcles(w http.ResponseWriter, r *http.Request) {
 }
 
 func AddContentMarket(w http.ResponseWriter, r *http.Request) {
-	answer, err := service.AddContentMarkeFetch(r)
+	answer, err := service.New(r).AddContentMarkeFetch()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -45,7 +45,7 @@ func AddContentMarket(w http.ResponseWriter, r *http.Request) {
 }
 
 func AllContentMarketing(w http.ResponseWriter, r *http.Request) {
-	answer, err := service.AllContentMarketingFetch(r)
+	answer, err := service.New(r).AllContentMarketingFetch()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -55,7 +55,7 @@ func AllContentMarketing(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteContentMarket(w http.ResponseWriter, r *http.Request) {
-	err := service.DeleteContentMarketFetch(r)
+	err := service.New(r).DeleteContentMarketFetch()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

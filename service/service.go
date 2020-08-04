@@ -8,9 +8,19 @@ import (
 	"practicing/repo/postgres"
 )
 
-func AddArticleFetch(r *http.Request) (postgres.Article, error) {
+type Service struct {
+	Request *http.Request
+}
+
+func New(r *http.Request) *Service {
+	return &Service{
+		Request: r,
+	}
+}
+
+func (r *Service) AddArticleFetch() (postgres.Article, error) {
 	//TODO: make pointers
-	art, err := ioutil.ReadAll(r.Body)
+	art, err := ioutil.ReadAll(r.Request.Body)
 	if err != nil {
 		return postgres.Article{}, err
 	}
@@ -19,7 +29,7 @@ func AddArticleFetch(r *http.Request) (postgres.Article, error) {
 	if err != nil {
 		return postgres.Article{}, err
 	}
-	artReturn, err := repo.AddArcicleDB(r.Context(), article)
+	artReturn, err := repo.AddArcicleDB(r.Request.Context(), article)
 	if err != nil {
 		return postgres.Article{}, err
 	}
@@ -28,8 +38,8 @@ func AddArticleFetch(r *http.Request) (postgres.Article, error) {
 }
 
 //todo Get Article
-func GetArticlesFetch(r *http.Request) ([]postgres.Article, error) {
-	ctx := r.Context()
+func (r *Service) GetArticlesFetch() ([]postgres.Article, error) {
+	ctx := r.Request.Context()
 	art, err := repo.GetArticlesDB(ctx)
 	if err != nil {
 		return nil, err
@@ -38,8 +48,8 @@ func GetArticlesFetch(r *http.Request) ([]postgres.Article, error) {
 
 }
 
-func ArcicleDeleteFetch(r *http.Request) error {
-	art, err := ioutil.ReadAll(r.Body)
+func (r *Service) ArcicleDeleteFetch() error {
+	art, err := ioutil.ReadAll(r.Request.Body)
 	if err != nil {
 		return err
 	}
@@ -48,15 +58,15 @@ func ArcicleDeleteFetch(r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	err = repo.ArticleDeletDB(r.Context(), article.Harvestid)
+	err = repo.ArticleDeletDB(r.Request.Context(), article.Harvestid)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func AddContentMarkeFetch(r *http.Request) (postgres.Contentmarketing, error) {
-	contentJson, err := ioutil.ReadAll(r.Body)
+func (r *Service) AddContentMarkeFetch() (postgres.Contentmarketing, error) {
+	contentJson, err := ioutil.ReadAll(r.Request.Body)
 	if err != nil {
 		return postgres.Contentmarketing{}, err
 	}
@@ -65,15 +75,15 @@ func AddContentMarkeFetch(r *http.Request) (postgres.Contentmarketing, error) {
 	if err != nil {
 		return postgres.Contentmarketing{}, err
 	}
-	answer, err := repo.AddContentMarketDB(r.Context(), market)
+	answer, err := repo.AddContentMarketDB(r.Request.Context(), market)
 	if err != nil {
 		return postgres.Contentmarketing{}, err
 	}
 	return answer, nil
 }
 
-func DeleteContentMarketFetch(r *http.Request) error {
-	contentDelJson, err := ioutil.ReadAll(r.Body)
+func (r *Service) DeleteContentMarketFetch() error {
+	contentDelJson, err := ioutil.ReadAll(r.Request.Body)
 	if err != nil {
 		return err
 	}
@@ -82,15 +92,15 @@ func DeleteContentMarketFetch(r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	err = repo.DeleteContentMarketDB(r.Context(), marketDelete.Harvestid)
+	err = repo.DeleteContentMarketDB(r.Request.Context(), marketDelete.Harvestid)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func AllContentMarketingFetch(r *http.Request) ([]postgres.Contentmarketing, error) {
-	ctx := r.Context()
+func (r *Service) AllContentMarketingFetch() ([]postgres.Contentmarketing, error) {
+	ctx := r.Request.Context()
 	answer, err := repo.AllContentMarketingDB(ctx)
 	if err != nil {
 		return nil, err
